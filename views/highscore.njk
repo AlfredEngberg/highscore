@@ -1,5 +1,11 @@
 {% extends "layout.njk" %}
 
 {% block content %}
+<main class="wrapper">
   <h1>{{ title }}</h1>
+  <ul>
+    {% for score in scores %}
+      <li>{{ score.score }}, {{ score.username }}, {{ score.game }}</li>
+    {% endfor %}
+</main>
 {% endblock %}
