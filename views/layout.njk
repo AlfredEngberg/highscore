@@ -5,10 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
-  <link rel="stylesheet" href="./public/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 
-<body>
+<body class="container">
+  <main>
+<nav>
+  <a href="/"><h1>Welcome</h1></a>
+  <ul>
+    <li><a href="/"><button href="/">Home</button></a></li>
+    <li><a href="/highscore"><button>get highscore</button></a></li>
+    <li><a href="/newHighscore"><button>post highscore</button></a></li>
+  </ul>
+</nav>
+  </main>
   {% block content %}{% endblock %}
 </body>
 

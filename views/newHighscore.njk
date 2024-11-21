@@ -1,0 +1,23 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+<h2>Post new highscore</h2>
+<form method="post" action="/newHighscore">
+
+    <fieldset>
+        <label for="username">username</label>
+        <input type="text" name="username" id="username">
+    </fieldset>
+
+    <fieldset>
+        <label for="score">score</label>
+        <input type="number" name="score" id="score">
+    </fieldset>
+
+    <fieldset>
+        <label for="game">game</label>
+        <input type="text" name="game" id="game">
+    </fieldset>
+    <input type="submit">
+</form>
+{% endblock %}

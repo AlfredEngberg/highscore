@@ -24,4 +24,27 @@ router.get('/highscore', async function (req, res) {
     // res.render('index.njk', { title: 'Highscore' })
 })
 
+// Get new highscorwe page
+router.get('/newHighscore', async function (req, res) {
+    res.render('newHighscore.njk')
+})
+
+// post high score route
+router.post('/newHighscore', async function (req, res) {
+    const username = req.body.username
+    const score = req.body.score
+    const game = req.body.game
+
+    try {
+        const [result] = await pool.promise().query('INSERT INTO score (username, score, game) VALUES (?, ?, ?);', [username, score, game])
+        console.log(result)
+        return res.redirect('/')
+    } catch (error) {
+        console.log('DET BLEV FEL')
+        console.log(error)
+        return res.json(error)
+    }
+
+})
+
 module.exports = router
