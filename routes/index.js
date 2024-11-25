@@ -3,6 +3,11 @@ const router = express.Router()
 
 const pool = require('../db')
 
+// uuid saker
+const { v4: uuidv4 } = require('uuid');
+const key = uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
+console.log(key)
+
 router.get('/', function (req, res) {
     res.render('index.njk', { title: 'Welcome' })
 })
