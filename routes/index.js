@@ -24,7 +24,7 @@ FROM
   JOIN game ON score.game_id = score.game_id
   JOIN user ON score.user_id = score.user_id
 WHERE
-  score.id = ?`, [req.params.id]
+  score.id = 1`
         );
 
         console.log(scores)
