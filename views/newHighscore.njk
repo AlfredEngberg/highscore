@@ -15,9 +15,13 @@
     </fieldset>
 
     <fieldset>
-        <label for="game">game</label>
-        <input type="text" name="game" id="game">
+        <select name="gameType" id="gameType">
+            {% for game in games %}
+            <option value="{{ game.id }}">{{ game.name }}</option>
+            {% endfor %}
+        </select>
     </fieldset>
+
     <input type="submit">
 </form>
 {% endblock %}
