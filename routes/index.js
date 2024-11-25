@@ -15,8 +15,18 @@ router.get('/', function (req, res) {
 router.get('/highscore', async function (req, res) {
     try {
         const [scores] = await pool.promise().query(
-            `SELECT * FROM score AS scores ORDER BY score DESC LIMIT 10;`
+            `SELECT
+  score.score AS score,
+  game.name AS game,
+  user.name AS username
+FROM
+  score
+  JOIN game ON score.game_id = score.game_id
+  JOIN user ON score.user_id = score.user_id
+WHERE
+  score.id = ?`, [req.params.id]
         );
+
         console.log(scores)
         return res.render('highscore.njk', {
             title: 'highscore',
