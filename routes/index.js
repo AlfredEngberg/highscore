@@ -12,19 +12,20 @@ router.get('/', function (req, res) {
     res.render('index.njk', { title: 'Welcome' })
 })
 
+// Get highscore page route
 router.get('/highscore', async function (req, res) {
     try {
         const [scores] = await pool.promise().query(
-            `SELECT
+            `            SELECT
   score.score AS score,
   game.name AS game,
   user.name AS username
 FROM
   score
-  JOIN game ON score.game_id = score.game_id
-  JOIN user ON score.user_id = score.user_id
-WHERE
-  score.id = 1`
+  JOIN game ON score.game_id = game.id
+  JOIN user ON score.user_id = user.id
+ORDER BY score DESC
+LIMIT 10`
         );
 
         console.log(scores)
@@ -51,7 +52,7 @@ router.post('/newHighscore', async function (req, res) {
     const game = req.body.game
 
     try {
-        const [result] = await pool.promise().query('INSERT INTO score (username, score, game) VALUES (?, ?, ?);', [username, score, game])
+        const [result] = await pool.promise().query('INSERT INTO score (score.score, score.user_id, score.game_id) VALUES (?, ?, ?);', [score, 1, 1])
         console.log(result)
         return res.redirect('/')
     } catch (error) {

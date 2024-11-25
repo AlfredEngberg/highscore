@@ -7,7 +7,7 @@
     <h2>Top 10 list</h2>
     <ul>
       {% for score in scores %}
-      <li>{{ score.score }}, {{ score.game }}, {{ score.username }}</li>
+      <li>{{ score.score }} | {{ score.game }} | {{ score.username }}</li>
       {% endfor %}
     </ul>
 </main>
