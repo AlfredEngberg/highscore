@@ -1,0 +1,35 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+<main class="container">
+    <h1>{{ title }}</h1>
+
+    <h2>Scores</h2>
+    <ul>
+        {% for score in scores %}
+        <li>{{ score.score }} | {{ score.game }} | {{ score.username }}
+            <button><a href="/adminpage/score/:id"></a>View</button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Games</h2>
+    <ul>
+        {% for game in games %}
+        <li>{{ game.name }} | {{ game.key }}
+            <button><a href="/adminpage/game/:id"></a>View</button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Users</h2>
+    <ul>
+        {% for user in users %}
+        <li>
+            {{ user.name }}
+            <button><a href="/adminpage/user/:id"></a>View</button>
+        </li>
+        {% endfor %}
+    </ul>
+</main>
+{% endblock %}

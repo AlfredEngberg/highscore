@@ -5,6 +5,7 @@ body {
 .container {
     width: min(80ch, 100vw - 2rem);
     margin-inline: auto;
+    display: grid;
 }
 
 img {

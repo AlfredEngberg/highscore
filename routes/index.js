@@ -5,8 +5,6 @@ const pool = require('../db')
 
 // uuid saker
 const { v4: uuidv4 } = require('uuid');
-const key = uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
-console.log(key)
 
 router.get('/', function (req, res) {
     res.render('index.njk', { title: 'Welcome' })
@@ -43,8 +41,8 @@ LIMIT 10`
 // Get new highscorwe page
 router.get('/newHighscore', async function (req, res) {
     const [games] = await pool.promise().query('SELECT * FROM game AS game');
-  /*   console.log(games) */
-    res.render('newHighscore.njk', {games})
+    /*   console.log(games) */
+    res.render('newHighscore.njk', { games })
 })
 
 // post high score route
@@ -72,10 +70,14 @@ router.get('/newGame', async function (req, res) {
 
 // post new game
 router.post('/newGame', async function (req, res) {
+    const key = uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
     const gameName = req.body.gameName
 
     try {
-        const [result] = await pool.promise().query('INSERT INTO game (name, key) VALUES (?, ?);', [gameName, '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'])
+        const [result] = await pool.promise().query(`INSERT INTO
+  game (name, \`key\`, created_at, updated_at)
+VALUES
+  (?, ?, now(), now());`, [gameName, key])
         console.log(result)
         return res.redirect('/')
     } catch (error) {
@@ -83,6 +85,33 @@ router.post('/newGame', async function (req, res) {
         console.log(error)
         return res.json(error)
     }
+})
+
+
+// Admin page
+router.get('/adminPage', async function (req, res) {
+    const [scores] = await pool.promise().query(
+        `            SELECT
+score.score AS score,
+game.name AS game,
+user.name AS username
+FROM
+score
+JOIN game ON score.game_id = game.id
+JOIN user ON score.user_id = user.id
+ORDER BY score DESC`
+    );
+
+    const [games] = await pool.promise().query('SELECT * FROM game AS game');
+    const [users] = await pool.promise().query('SELECT * FROM user AS user');
+
+    console.log(scores)
+    return res.render('adminPage.njk', {
+        title: 'Admin Page',
+        scores: scores,
+        games: games ,
+        users: users
+    })
 })
 
 module.exports = router
