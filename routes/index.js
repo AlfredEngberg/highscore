@@ -65,4 +65,24 @@ router.post('/newHighscore', async function (req, res) {
 
 })
 
+// Get new game page
+router.get('/newGame', async function (req, res) {
+    res.render('newGame.njk')
+})
+
+// post new game
+router.post('/newGame', async function (req, res) {
+    const gameName = req.body.gameName
+
+    try {
+        const [result] = await pool.promise().query('INSERT INTO game (name, key) VALUES (?, ?);', [gameName, '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'])
+        console.log(result)
+        return res.redirect('/')
+    } catch (error) {
+        console.log('DET BLEV FEL I POST GAME')
+        console.log(error)
+        return res.json(error)
+    }
+})
+
 module.exports = router

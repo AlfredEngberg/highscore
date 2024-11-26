@@ -1,0 +1,13 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+<h2>add new game</h2>
+<form method="post" action="/newGame">
+    <fieldset>
+        <label for="gameName">game name</label>
+        <input type="text" name="gameName" id="gameName" required>
+    </fieldset>
+
+    <input type="submit">
+</form>
+{% endblock %}
