@@ -1,0 +1,13 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+<h2>Delete game?</h2>
+<form method="post" action="/adminpage/deleteGame/{{ game.key }}">
+    <fieldset>
+        <input type="submit" value="Delete">
+    </fieldset>
+</form>
+<fieldset>
+    <a href="/adminPage">Cancel</a>
+</fieldset>
+{% endblock %}

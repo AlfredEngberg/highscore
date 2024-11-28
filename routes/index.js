@@ -14,20 +14,6 @@ router.get('/', function (req, res) {
 router.get('/highscore', async function (req, res) {
     try {
         const [games] = await pool.promise().query('SELECT * FROM game AS game');
-        /*  const [scores] = await pool.promise().query(
-             `SELECT
-                 score.score AS score,
-                 game.name AS game,
-                 user.name AS username
-             FROM score
-             JOIN game ON score.game_id = game.id
-             JOIN user ON score.user_id = user.id
-             WHERE
-                 game.key = ?
-             ORDER BY
-                 score DESC
-             LIMIT
-                 10`, [gameType]); */
         return res.render('highscore.njk', {
             title: 'highscore',
             games: games
@@ -36,6 +22,31 @@ router.get('/highscore', async function (req, res) {
         console.log(error)
         res.sendStatus(500)
     }
+})
+router.get('/highscore/:key', async function (req, res) {
+    let scores = []
+    try {
+        [scores] = await pool.promise().query(
+            `SELECT
+  score.score AS score,
+  game.name AS game,
+  user.name AS username
+FROM
+  score
+  JOIN game ON score.game_id = game.id
+  JOIN user ON score.user_id = user.id
+WHERE
+  game.key = ?
+ORDER BY
+  score DESC
+LIMIT
+  10;`, [req.params.key]);
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+    console.log(scores)
+    res.render('gameHighscores.njk', { scores })
 })
 
 // Get new highscorwe page
@@ -92,14 +103,14 @@ VALUES
 router.get('/adminPage', async function (req, res) {
     const [scores] = await pool.promise().query(
         `            SELECT
-score.score AS score,
-game.name AS game,
-user.name AS username
-FROM
-score
-JOIN game ON score.game_id = game.id
-JOIN user ON score.user_id = user.id
-ORDER BY score DESC`
+                        score.score AS score,
+                        game.name AS game,
+                        user.name AS username
+                    FROM
+                        score
+                    JOIN game ON score.game_id = game.id
+                    JOIN user ON score.user_id = user.id
+                    ORDER BY score DESC`
     );
 
     const [games] = await pool.promise().query('SELECT * FROM game AS game');
@@ -114,31 +125,42 @@ ORDER BY score DESC`
     })
 })
 
-
-router.get('/highscore/:key', async function (req, res) {
-    let scores = []
+// Get edit game page
+router.get('/adminPage/editGame/:id', async function (req, res) {
+    const gameKey = req.params.key
+    res.render('editGame.njk', { key: gameKey })
+})
+// Post edit game
+router.post('/adminPage/editGame/:id', async function (req, res) {
+    const gameName = req.body.gameName
+    const gameKey = req.params.key
     try {
-        [scores] = await pool.promise().query(
-            `SELECT
-  score.score AS score,
-  game.name AS game,
-  user.name AS username
-FROM
-  score
-  JOIN game ON score.game_id = game.id
-  JOIN user ON score.user_id = user.id
-WHERE
-  game.key = ?
-ORDER BY
-  score DESC
-LIMIT
-  10;`, [req.params.key]);
+        const [result] = await pool.promise().query('UPDATE game SET name = ? WHERE key = ?;', [gameName, gameKey])
+        console.log(result)
+        return res.redirect('/adminPage')
     } catch (error) {
+        console.log('DET BLEV FEL I UPDATE GAME')
         console.log(error)
-        res.sendStatus(500)
+        return res.json(error)
     }
-    console.log(scores)
-    res.render('gameHighscores.njk', { scores })
 })
 
+// Get delete game page
+router.get('/adminPage/deleteGame/:id', async function (req, res) {
+    res.render('deleteGame.njk', { key: req.params.key })
+})
+
+// Post delete game
+router.post('/adminPage/deleteGame/:id', async function (req, res) {
+    const gameKey = req.params.key
+    try {
+        const [result] = await pool.promise().query('DELETE FROM game WHERE key = ?;', [gameKey])
+        console.log(result)
+        return res.redirect('/adminPage')
+    } catch (error) {
+        console.log('DET BLEV FEL I DELETE GAME')
+        console.log(error)
+        return res.json(error)
+    }
+})
 module.exports = router
