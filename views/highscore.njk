@@ -3,12 +3,17 @@
 {% block content %}
 <main class="wrapper">
   <h1>{{ title }}</h1>
-  <ul>
-    <h2>Top 10 list</h2>
-    <ul>
-      {% for score in scores %}
-      <li>{{ score.score }} | {{ score.game }} | {{ score.username }}</li>
-      {% endfor %}
-    </ul>
+  <h2>Top 10 list</h2>
+
+  <form method="get" action="/highscore">
+    <fieldset>
+      <ul>
+        {% for game in games %}
+        <li>
+          <a href="/highscore/{{game.key}}" class="button"> {{ game.name }} </a>
+        </li>
+        {% endfor %}
+      </ul>
+  </form>
 </main>
 {% endblock %}
