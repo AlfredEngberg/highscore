@@ -2,8 +2,9 @@
 
 {% block content %}
 <h2>Update {{game.name}}</h2>
-<form method="post" action="/newGame">
+<form method="post" action="/game/edit">
     <fieldset>
+        <input type="hidden" value="{{ id }}" name="id">
         <label for="gameName">game name</label>
         <input type="text" name="gameName" id="gameName" required>
     </fieldset>
