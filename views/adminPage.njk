@@ -18,8 +18,8 @@
         {% for game in games %}
         <li>{{ game.name }} | {{ game.key }}
             <button><a href="/highscore/{{game.key}}">View</a></button>
-            <button><a href="/adminpage/deleteGame/{{game.key}}">Delete</a></button>
-            <button><a href="/adminpage/editGame/{{game.key}}">Edit</a></button>
+            <button><a href="/game/{{ game.id }}/delete">Delete</a></button>
+            <button><a href="/adminpage/{{game.key}}/editGame">Edit</a></button>
         </li>
         {% endfor %}
     </ul>

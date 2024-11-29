@@ -126,12 +126,12 @@ router.get('/adminPage', async function (req, res) {
 })
 
 // Get edit game page
-router.get('/adminPage/editGame/:id', async function (req, res) {
+router.get('/adminPage/:id/editGame', async function (req, res) {
     const gameKey = req.params.key
     res.render('editGame.njk', { key: gameKey })
 })
 // Post edit game
-router.post('/adminPage/editGame/:id', async function (req, res) {
+router.post('/adminPage/:id/editGame', async function (req, res) {
     const gameName = req.body.gameName
     const gameKey = req.params.key
     try {
@@ -146,15 +146,17 @@ router.post('/adminPage/editGame/:id', async function (req, res) {
 })
 
 // Get delete game page
-router.get('/adminPage/deleteGame/:id', async function (req, res) {
-    res.render('deleteGame.njk', { key: req.params.key })
+router.get('/game/:id/delete', async function (req, res) {
+    res.render('deleteGame.njk', { id: req.params.id })
 })
 
 // Post delete game
-router.post('/adminPage/deleteGame/:id', async function (req, res) {
-    const gameKey = req.params.key
+router.post('/game/delete', async function (req, res) {
+    const gameKey = req.body.id
+    console.log(req.body.id)
     try {
-        const [result] = await pool.promise().query('DELETE FROM game WHERE key = ?;', [gameKey])
+        const [result] = await pool.promise()
+            .query(`DELETE FROM game WHERE id = ?;`, [gameKey])
         console.log(result)
         return res.redirect('/adminPage')
     } catch (error) {

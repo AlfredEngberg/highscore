@@ -2,8 +2,9 @@
 
 {% block content %}
 <h2>Delete game?</h2>
-<form method="post" action="/adminpage/deleteGame/{{ game.key }}">
+<form method="post" action="/game/delete">
     <fieldset>
+        <input type="hidden" value="{{ id }}" name="id">
         <input type="submit" value="Delete">
     </fieldset>
 </form>
