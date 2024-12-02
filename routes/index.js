@@ -92,7 +92,7 @@ router.get('/newGame', async function (req, res) {
 
 // post new game
 router.post('/newGame',
-    body('gameName').notEmpty().isString().trim().escape(),
+    body('gameName').notEmpty().isString().trim().isLength({ min: 0, max: 16 }).escape(),
     async function (req, res) {
         const result = validationResult(req)
         const key = uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
