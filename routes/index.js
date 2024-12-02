@@ -1,10 +1,14 @@
 const express = require('express')
+const { query, matchedData, validationResult, body, params } = require('express-validator')
+const app = express()
 const router = express.Router()
+// const session = require('express-session')
 
 const pool = require('../db')
 
 // uuid saker
 const { v4: uuidv4 } = require('uuid');
+const e = require('express')
 
 router.get('/', function (req, res) {
     res.render('index.njk', { title: 'Welcome' })
@@ -57,22 +61,30 @@ router.get('/newHighscore', async function (req, res) {
 })
 
 // post high score route
-router.post('/newHighscore', async function (req, res) {
-    const username = req.body.username
-    const score = req.body.score
-    const game = req.body.game
-    console.log(game)
-    try {
-        const [result] = await pool.promise().query('INSERT INTO score (score, score.user_id, score.game_id) VALUES (?, ?, ?);', [score, username, game])
-        console.log(result)
-        return res.redirect('/')
-    } catch (error) {
-        console.log('DET BLEV FEL I POST HIGHSCORE')
-        console.log(error)
-        return res.json(error)
-    }
+router.post('/newHighscore',
+    body('username').notEmpty().isString().trim().escape(),
+    async function (req, res) {
+        const result = validationResult(req)
+        /* const username = req.body.username */
+        const score = req.body.score
+        const game = req.body.game
 
-})
+        if (result.isEmpty()) {
+            const data = matchedData(req)
+            try {
+                const [dbResult] = await pool.promise().query('INSERT INTO score (score, score.user_id, score.game_id) VALUES (?, ?, ?);', [score, data.username, game])
+                console.log(dbResult)
+                return res.redirect('/')
+            } catch (error) {
+                console.log('DET BLEV FEL I POST HIGHSCORE')
+                console.log(error)
+                return res.json(error)
+            }
+        } else {
+            console.log(result)
+            return res.json(result)
+        }
+    })
 
 // Get new game page
 router.get('/newGame', async function (req, res) {
@@ -80,23 +92,31 @@ router.get('/newGame', async function (req, res) {
 })
 
 // post new game
-router.post('/newGame', async function (req, res) {
-    const key = uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
-    const gameName = req.body.gameName
-
-    try {
-        const [result] = await pool.promise().query(`INSERT INTO
+router.post('/newGame',
+    body('gameName').notEmpty().isString().trim().escape(),
+    async function (req, res) {
+        const result = validationResult(req)
+        const key = uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
+        // const gameName = req.body.gameName
+        if (result.isEmpty()) {
+            const data = matchedData(req)
+            try {
+                const [dbResult] = await pool.promise().query(`INSERT INTO
   game (name, \`key\`, created_at, updated_at)
 VALUES
-  (?, ?, now(), now());`, [gameName, key])
-        console.log(result)
-        return res.redirect('/')
-    } catch (error) {
-        console.log('DET BLEV FEL I POST GAME')
-        console.log(error)
-        return res.json(error)
-    }
-})
+  (?, ?, now(), now());`, [data.gameName, key])
+                console.log(dbResult)
+                return res.redirect('/')
+            } catch (error) {
+                console.log('DET BLEV FEL I POST GAME')
+                console.log(error)
+                return res.json(error)
+            }
+        } else {
+            console.log(result)
+            return res.json(result)
+        }
+    })
 
 
 // Admin page
@@ -131,21 +151,28 @@ router.get('/game/:id/edit', async function (req, res) {
 })
 
 // Post edit game
-router.post('/game/edit', async function (req, res) {
-    const game_id = req.body.id
-    const gameName = req.body.gameName
-    console.log(req.body.id)
-    console.log(req.body.gameName)
-    try {
-        const [result] = await pool.promise().query(`UPDATE game SET name = ?, updated_at = now() WHERE id = ?;`, [gameName, game_id])
-        console.log(result)
-        return res.redirect('/adminPage')
-    } catch (error) {
-        console.log('DET BLEV FEL I UPDATE GAME')
-        console.log(error)
-        return res.json(error)
-    }
-})
+router.post('/game/edit',
+    body('id').isInt({ min: 0 }).withMessage('Game is required').toInt().notEmpty().escape(),
+    body('gameName').notEmpty().isString().trim().escape(),
+    async function (req, res) {
+        const result = validationResult(req)
+
+        if (result.isEmpty()) {
+            const data = matchedData(req)
+            try {
+                const [dbResult] = await pool.promise().query(`UPDATE game SET name = ?, updated_at = now() WHERE id = ?;`, [data.gameName, data.id])
+                console.log(dbResult)
+                return res.redirect('/adminPage')
+            } catch (error) {
+                console.log('DET BLEV FEL I UPDATE GAME')
+                console.log(error)
+                return res.json(error)
+            }
+        } else {
+            console.log(result)
+            return res.json(result)
+        }
+    })
 
 // Get delete game page
 router.get('/game/:id/delete', async function (req, res) {
@@ -153,18 +180,20 @@ router.get('/game/:id/delete', async function (req, res) {
 })
 
 // Post delete game
-router.post('/game/delete', async function (req, res) {
-    const game_id = req.body.id
-    console.log(req.body.id)
-    try {
-        const [result] = await pool.promise()
-            .query(`DELETE FROM game WHERE id = ?;`, [game_id])
-        console.log(result)
-        return res.redirect('/adminPage')
-    } catch (error) {
-        console.log('DET BLEV FEL I DELETE GAME')
-        console.log(error)
-        return res.json(error)
-    }
-})
+router.post('/game/delete',
+    body('id').isInt({ min: 0 }).withMessage('Game is required').toInt().notEmpty().escape(),
+    async function (req, res) {
+        const game_id = req.body.id
+        console.log(req.body.id)
+        try {
+            const [result] = await pool.promise()
+                .query(`DELETE FROM game WHERE id = ?;`, [game_id])
+            console.log(result)
+            return res.redirect('/adminPage')
+        } catch (error) {
+            console.log('DET BLEV FEL I DELETE GAME')
+            console.log(error)
+            return res.json(error)
+        }
+    })
 module.exports = router
