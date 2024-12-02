@@ -63,16 +63,15 @@ router.get('/newHighscore', async function (req, res) {
 // post high score route
 router.post('/newHighscore',
     body('username').notEmpty().isString().trim().escape(),
+    body('score').isInt({ min: 0 }).withMessage('Score is required').toInt().notEmpty().trim().escape(),
+    body('game').isInt({ min: 0 }).withMessage('Game is required').toInt().notEmpty().trim().escape(),
     async function (req, res) {
         const result = validationResult(req)
-        /* const username = req.body.username */
-        const score = req.body.score
-        const game = req.body.game
 
         if (result.isEmpty()) {
             const data = matchedData(req)
             try {
-                const [dbResult] = await pool.promise().query('INSERT INTO score (score, score.user_id, score.game_id) VALUES (?, ?, ?);', [score, data.username, game])
+                const [dbResult] = await pool.promise().query('INSERT INTO score (score, score.user_id, score.game_id) VALUES (?, ?, ?);', [data.score, data.username, data.game])
                 console.log(dbResult)
                 return res.redirect('/')
             } catch (error) {
@@ -181,7 +180,7 @@ router.get('/game/:id/delete', async function (req, res) {
 
 // Post delete game
 router.post('/game/delete',
-    body('id').isInt({ min: 0 }).withMessage('Game is required').toInt().notEmpty().escape(),
+    body('id').isInt({ min: 0 }).withMessage('Game is required').toInt().notEmpty().trim().escape(),
     async function (req, res) {
         const game_id = req.body.id
         console.log(req.body.id)
